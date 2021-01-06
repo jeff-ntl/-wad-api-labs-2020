@@ -39,7 +39,7 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }));
-app.use('/api/movies', passport.authenticate('jwt', {session: false}), moviesRouter);
+app.use('/api/movies', moviesRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/genres', genresRouter);
 app.use(errHandler);
