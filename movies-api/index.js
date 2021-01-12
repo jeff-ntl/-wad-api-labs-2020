@@ -8,6 +8,13 @@ import usersRouter from './api/users';
 import genresRouter from './api/genres';
 import session from 'express-session';
 import passport from './authenticate';
+import loglevel from 'loglevel';
+
+if (process.env.NODE_ENV === 'test') {
+  loglevel.setLevel('warn')
+ } else {
+  loglevel.setLevel('info')
+ }
 
 dotenv.config();
 
@@ -44,6 +51,8 @@ app.use('/api/users', usersRouter);
 app.use('/api/genres', genresRouter);
 app.use(errHandler);
 
-app.listen(port, () => {
-  console.info(`Server running at ${port}`);
+let server = app.listen(port, () => {
+  loglevel.info(`Server running at ${port}`);
 });
+
+module.exports = server
