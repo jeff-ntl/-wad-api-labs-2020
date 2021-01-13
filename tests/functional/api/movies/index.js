@@ -89,7 +89,7 @@ describe("Movies endpoint", () => {
     delete require.cache[require.resolve("../../../../index")];
   });
   describe("GET /movies ", () => {
-    it("should return 20 movies and a status 200", (done) => {
+    it("should return 2 movies and a status 200", (done) => {
       request(api)
         .get("/api/movies")
         .set("Accept", "application/json")

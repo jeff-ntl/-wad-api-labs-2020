@@ -41,10 +41,10 @@ test_api:
   script:
     - npm test
 
-deploy_staging:
+deploy_master:
   image: ruby:latest
   only:
-    - develop
+    - master
   stage: staging
   before_script:
     - apt-get update -qy
