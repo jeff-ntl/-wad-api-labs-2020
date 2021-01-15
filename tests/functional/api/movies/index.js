@@ -14,6 +14,11 @@ const sampleMovie = {
   title: "Mulan",
 };
 
+const movieToPost = {
+  title: "New Movie"
+};
+let movieId 
+
 const sampleMovies = [
   {
       "adult": false,
@@ -88,6 +93,7 @@ describe("Movies endpoint", () => {
     api.close(); // Release PORT 8080
     delete require.cache[require.resolve("../../../../index")];
   });
+  
   describe("GET /movies ", () => {
     it("should return 2 movies and a status 200", (done) => {
       request(api)
@@ -131,4 +137,42 @@ describe("Movies endpoint", () => {
       });
     });
   });
+
+  describe("POST /movies ", () => {
+
+    describe("when movie title is provided", () => {
+      it("should return a 201 status and the newly added movie", () => {
+        return request(api)
+          .post("/api/movies")
+          .send(movieToPost)
+          .expect(201)
+          .then((res) => {
+            expect(res.body.title).equals(movieToPost.title);
+            movieId = res.body.id;
+          });
+      });
+      after(() => {
+          return request(api)
+            .get(`/api/movies/${movieId}`)
+            .expect(200)
+            .then((res) => {
+              expect(res.body).to.have.property("title", movieToPost.title);
+            });
+      });
+    });
+
+    describe("when movie is not provided", () => {
+      it("should return the NOT found message", () => {
+        return request(api)
+          .post("/api/movies")
+          .expect(405)
+          .then((res) => {
+            expect(res.body).to.have.property("message", "Invalid Movie Data");
+          });
+      });
+    });
+
+  });
+
+
 });
