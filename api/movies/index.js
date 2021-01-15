@@ -21,7 +21,7 @@ router.post('/', (req, res, next) => {
     movieModel.create(newMovie).then(res.status(201).send(newMovie)).catch(next);
   } else {
     res.status(405).send({
-      message: "Invalid Movie Data",
+      message: "Request body is empty.",
       status: 405
     });
   }
@@ -39,7 +39,6 @@ router.put('/:id',  (req, res, next) => {
   }
   else{
     let updatedMovie = req.body
-    console.log(updatedMovie)
     movieModel.exists({ id: reqID }).then(movie => {
       if (updatedMovie._id) delete updatedMovie._id;
 

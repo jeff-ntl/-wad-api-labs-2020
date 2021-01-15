@@ -17,7 +17,12 @@ const sampleMovie = {
 const movieToPost = {
   title: "New Movie"
 };
+
 let movieId 
+
+const movieToPut = {
+  title: "Edited Movie"
+};
 
 const sampleMovies = [
   {
@@ -93,7 +98,7 @@ describe("Movies endpoint", () => {
     api.close(); // Release PORT 8080
     delete require.cache[require.resolve("../../../../index")];
   });
-  
+
   describe("GET /movies ", () => {
     it("should return 2 movies and a status 200", (done) => {
       request(api)
@@ -139,8 +144,7 @@ describe("Movies endpoint", () => {
   });
 
   describe("POST /movies ", () => {
-
-    describe("when movie title is provided", () => {
+    describe("when movie is provided", () => {
       it("should return a 201 status and the newly added movie", () => {
         return request(api)
           .post("/api/movies")
@@ -162,17 +166,72 @@ describe("Movies endpoint", () => {
     });
 
     describe("when movie is not provided", () => {
-      it("should return the NOT found message", () => {
+      it("should return a 405 status and Request body is empty message", () => {
         return request(api)
           .post("/api/movies")
           .expect(405)
           .then((res) => {
-            expect(res.body).to.have.property("message", "Invalid Movie Data");
+            expect(res.body).to.have.property("message", "Request body is empty.");
           });
       });
     });
 
   });
 
+  describe("PUT /movies ", () => {
+    describe("when the id is valid & movie is provided", () => {
+        it("should return a 201 status and the newly updated movie", () => {
+        return request(api)
+          .put(`/api/movies/${sampleMovie.id}`)
+          .send(movieToPut)
+          .expect(201)
+          .then((res) => {
+              expect(res.body).to.have.property("message", `Movie ${sampleMovie.id} updated.`);
+          });
+        });
+        after(() => {
+          return request(api)
+            .get(`/api/movies/${sampleMovie.id}`)
+            .expect(200)
+            .then((res) => {
+                expect(res.body).to.have.property("title", "Edited Movie");
+                expect(res.body).to.have.property("id", sampleMovie.id);
+            });
+        });
+    });
+    describe("Error Handling", () => {
+      describe("when the id is invalid", () => {
+        it("should return a 405 status and Please provide a valid movie ID message", () => {
+            return request(api)
+            .put(`/api/movies/999999`)
+            .send(movieToPut)
+            .expect({
+                message: "Please provide a valid movie ID.",
+                status: 405,
+            });
+        });
+      });
+      describe("when the new movie data is not provided", () => {
+        it("should return 405 status and Request body is empty message", () => {
+          return request(api)
+            .put(`/api/movies/${sampleMovie.id}`)
+            .expect(405)
+            .then((res) => {
+              expect(res.body).to.have.property("message", "Request body is empty.")
+            });
+        });
+      });
+      after(() => {
+        return request(api)
+        .get(`/api/movies/${sampleMovie.id}`)
+        .expect(200)
+        .then((res) => {
+            expect(res.body).to.have.property("title", sampleMovie.title);
+            expect(res.body).to.have.property("id", sampleMovie.id);
+        });
+     });
 
+    })
+    
+  });
 });
