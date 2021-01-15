@@ -132,6 +132,18 @@ describe("Movies endpoint", () => {
           });
       });
     });
+    describe("when the id is valid but cannot be found in the database", () => {
+      it("should return message not found.", () => {
+        return request(api)
+          .get("/api/movies/999999")
+          .expect("Content-Type", /json/)
+          .expect(405)
+          .then((res) => {
+            expect(res.body).to.have.property("message", "Unable to find movie with id: 999999.");
+            expect(res.body).to.have.property("status", 405);
+          });
+      });
+    });
     describe("when the id is invalid", () => {
       it("should return the NOT found message", () => {
         return request(api)
@@ -144,7 +156,7 @@ describe("Movies endpoint", () => {
   });
 
   describe("POST /movies ", () => {
-    describe("when movie is provided", () => {
+    describe("when new movie is provided", () => {
       it("should return a 201 status and the newly added movie", () => {
         return request(api)
           .post("/api/movies")
@@ -165,8 +177,8 @@ describe("Movies endpoint", () => {
       });
     });
 
-    describe("when movie is not provided", () => {
-      it("should return a 405 status and Request body is empty message", () => {
+    describe("when new movie is not provided", () => {
+      it("should return a 405 status and 'Request body is empty.' message", () => {
         return request(api)
           .post("/api/movies")
           .expect(405)
@@ -200,8 +212,8 @@ describe("Movies endpoint", () => {
         });
     });
     describe("Error Handling", () => {
-      describe("when the id is invalid", () => {
-        it("should return a 405 status and Please provide a valid movie ID message", () => {
+      describe("when the movie with the id provided cannot be found", () => {
+        it("should return a 405 status and 'Please provide a valid movie ID.' message", () => {
             return request(api)
             .put(`/api/movies/999999`)
             .send(movieToPut)
@@ -211,8 +223,8 @@ describe("Movies endpoint", () => {
             });
         });
       });
-      describe("when the new movie data is not provided", () => {
-        it("should return 405 status and Request body is empty message", () => {
+      describe("when new movie data is not provided", () => {
+        it("should return 405 status and 'Request body is empty.' message", () => {
           return request(api)
             .put(`/api/movies/${sampleMovie.id}`)
             .expect(405)
@@ -230,8 +242,42 @@ describe("Movies endpoint", () => {
             expect(res.body).to.have.property("id", sampleMovie.id);
         });
      });
-
     })
-    
+  });
+
+  describe("Delete /movies/:id", () => {
+    describe("when the id is valid", () => {
+      it("should return a 201 status and movie deleted message", () => {
+        return request(api)
+          .delete(`/api/movies/${sampleMovie.id}`)
+          .set("Accept", "application/json")
+          .expect("Content-Type", /json/)
+          .expect(201)
+          .then((res) => {
+            expect(res.body).to.have.property("message", `Movie ${sampleMovie.id} deleted.`);     
+        });
+      });
+      after(() => {
+        return request(api)
+          .get(`/api/movies/${sampleMovie.id}`)
+          .expect(405)
+          .then((res) => {
+            expect(res.body).to.have.property("message", `Unable to find movie with id: ${sampleMovie.id}.`);
+            expect(res.body).to.have.property("status", 405);
+          });
+      });
+    });
+    describe("when the id is invalid", () => {
+        it("should return the NOT found message", () => {
+            return request(api)
+                .delete("/api/movies/999999")
+                .set("Accept", "application/json")
+                .expect("Content-Type", /json/)
+                .expect({
+                    message: "Movie 999999 cannot be found.",
+                    status: 405,
+                });
+        });
+    });
   });
 });

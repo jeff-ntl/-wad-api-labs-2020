@@ -48,7 +48,7 @@ router.put('/:id',  (req, res, next) => {
         }, updatedMovie, {
           upsert: false,
         })
-        .then(res.status(201).send({message: `Movie ${reqID} updated.`})).catch(next)
+        .then(res.status(201).send({message: `Movie ${reqID} updated.`})).catch((error) => next(error))
       } 
       else {
         res.status(405).send({
@@ -68,11 +68,11 @@ router.delete('/:id',  (req, res, next) => {
 
     if (movie) {
       movieModel.deleteOne({id: reqID})
-      .then(res.status(201).send({message: `Movie ${reqID} deleted.`})).catch(next)
+      .then(res.status(201).send({message: `Movie ${reqID} deleted.`})).catch((error) => next(error))
     } 
     else {
       res.status(405).send({
-        message: "Please provide a valid movie ID.",
+        message: `Movie ${reqID} cannot be found.`,
         status: 405
       });
     }
@@ -89,8 +89,19 @@ router.get('/trending', (req, res, next) => {
 
 router.get('/:id', (req, res, next) => {
   const id = parseInt(req.params.id);
-  movieModel.findByMovieDBId(id).then(movie => res.status(200).send(movie)).catch(next);
+  movieModel.findByMovieDBId(id).then(movie => {
+    if (movie){
+      res.status(200).send(movie)
+    }
+    else{
+      res.status(405).send({
+        message: `Unable to find movie with id: ${id}.`,
+        status: 405
+      })
+    }
+  }).catch(next);
 });
+
 
 router.get('/:id/reviews', (req, res, next) => {
   const id = parseInt(req.params.id);
