@@ -29,17 +29,47 @@ router.post('/', (req, res, next) => {
 
 // Update a movie
 router.put('/:id',  (req, res, next) => {
-  let reqID = req.params.id
+  const reqID = parseInt(req.params.id);
+
+  if(Object.keys(req.body).length === 0){
+    res.status(405).send({
+      message: "Request body is empty.",
+      status: 405
+    });
+  }
+  else{
+    let updatedMovie = req.body
+    console.log(updatedMovie)
+    movieModel.exists({ id: reqID }).then(movie => {
+      if (updatedMovie._id) delete updatedMovie._id;
+
+      if (movie) {
+        movieModel.updateOne({
+          id: reqID,
+        }, updatedMovie, {
+          upsert: false,
+        })
+        .then(res.status(201).send({message: `Movie ${reqID} updated.`})).catch(next)
+      } 
+      else {
+        res.status(405).send({
+          message: "Please provide a valid movie ID.",
+          status: 405
+        });
+      }
+    })
+  }
+  
+});
+
+// Delete a movie
+router.delete('/:id',  (req, res, next) => {
+  const reqID = parseInt(req.params.id);
   movieModel.exists({ id: reqID }).then(movie => {
-    if (req.body._id) delete req.body._id;
 
     if (movie) {
-      movieModel.update({
-        id: reqID,
-      }, req.body, {
-        upsert: false,
-      })
-      .then(res.status(201).send({message: `Movie ${reqID} updated.`})).catch(next)
+      movieModel.deleteOne({id: reqID})
+      .then(res.status(201).send({message: `Movie ${reqID} deleted.`})).catch(next)
     } 
     else {
       res.status(405).send({
