@@ -3,12 +3,51 @@ import {
   getMovies, getMovie, getMovieReviews, getUpcomingMovies, getTrendingMovies
 } from './tmdb-api';
 import movieModel from './movieModel';
+import { movies } from '../../seedData/movies';
 
 
 const router = express.Router();
 
 router.get('/', (req, res, next) => {
   movieModel.find().then(movies => res.status(200).send(movies)).catch(next);
+});
+
+//Create a new movie
+router.post('/', (req, res, next) => {
+  let newMovie = req.body;
+  if (newMovie && newMovie.title) {
+    //Adds a random id if missing. 
+    !newMovie.id ? newMovie.id = Math.round(Math.random() * 10000) : newMovie 
+    movieModel.create(newMovie).then(res.status(201).send(newMovie)).catch(next);
+  } else {
+    res.status(405).send({
+      message: "Invalid Movie Data",
+      status: 405
+    });
+  }
+});
+
+// Update a movie
+router.put('/:id',  (req, res, next) => {
+  let reqID = req.params.id
+  movieModel.exists({ id: reqID }).then(movie => {
+    if (req.body._id) delete req.body._id;
+
+    if (movie) {
+      movieModel.update({
+        id: reqID,
+      }, req.body, {
+        upsert: false,
+      })
+      .then(res.status(201).send({message: `Movie ${reqID} updated.`})).catch(next)
+    } 
+    else {
+      res.status(405).send({
+        message: "Please provide a valid movie ID.",
+        status: 405
+      });
+    }
+  })
 });
 
 router.get('/upcoming', (req, res, next) => {
