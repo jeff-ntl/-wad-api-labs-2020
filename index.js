@@ -47,6 +47,8 @@ app.use(session({
   saveUninitialized: true
 }));
 app.use('/api/movies', moviesRouter);
+//authentication is required for accessing favourites movies
+app.use("/api/users/:id/favourites",passport.authenticate('jwt', {session: false}));
 app.use('/api/users', usersRouter);
 app.use('/api/genres', genresRouter);
 app.use(errHandler);

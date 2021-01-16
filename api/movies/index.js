@@ -48,7 +48,7 @@ router.put('/:id',  (req, res, next) => {
         }, updatedMovie, {
           upsert: false,
         })
-        .then(res.status(201).send({message: `Movie ${reqID} updated.`})).catch((error) => next(error))
+        .then(res.status(201).send({message: `Movie ${reqID} updated.`})).catch(next)
       } 
       else {
         res.status(405).send({
@@ -68,7 +68,7 @@ router.delete('/:id',  (req, res, next) => {
 
     if (movie) {
       movieModel.deleteOne({id: reqID})
-      .then(res.status(201).send({message: `Movie ${reqID} deleted.`})).catch((error) => next(error))
+      .then(res.status(201).send({message: `Movie ${reqID} deleted.`})).catch(next)
     } 
     else {
       res.status(405).send({

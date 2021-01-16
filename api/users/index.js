@@ -58,9 +58,9 @@ router.post('/', async (req, res, next) => {
 });
 
 // Update a user
-router.put('/:id',  (req, res) => {
+router.put('/:id',  (req, res, next) => {
     if (req.body._id) delete req.body._id;
-     User.update({
+     User.updateOne({
       _id: req.params.id,
     }, req.body, {
       upsert: false,
@@ -76,7 +76,7 @@ router.get('/:userName/favourites', (req, res, next) => {
   ).catch(next);
 });
 
-//Add a favourite. No Error Handling Yet. Can add duplicates too!
+//Add a favourite
 router.post('/:userName/favourites', async (req, res, next) => {
   try{
     const newFavourite = req.body.id;
