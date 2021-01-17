@@ -33,9 +33,11 @@ if (process.env.SEED_DB === 'true' && process.env.NODE_ENV === 'development') {
 }
 
 const app = express();
+const helmet = require("helmet");
 
 const port = process.env.PORT;
 
+app.use(helmet());
 //configure body-parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
