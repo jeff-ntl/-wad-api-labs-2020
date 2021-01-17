@@ -83,7 +83,7 @@ export const getMovies = () => {
 ## Extra features
 Helmet middleware is implemented for better security.
 + This is how it looks like after implementing Helmet
-![helmet](./movies-api/public/helmet.png)
+![helmet](./public/helmet.png)
 + This link explain what the screenshot below means: https://www.twilio.com/blog/securing-your-express-app-html
 
 ## Independent learning.
@@ -148,11 +148,11 @@ Run npm test for more detailed info.
 
 + Staging app overview 
 
-![staging-overview](./movies-api/public/staging-overview.png)
+![staging-overview](./public/staging-overview.png)
 
 + Production app overview 
 
-![production-overview](./movies-api/public/production-overview.png)
+![production-overview](./public/production-overview.png)
 
 ## Independent learning.
 
